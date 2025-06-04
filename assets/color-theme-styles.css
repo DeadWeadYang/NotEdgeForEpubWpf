@@ -1,0 +1,25 @@
+body.reading-theme-dark{
+    background-color:rgb(31, 31, 31) !important;
+    color:white !important;
+    accent-color: auto;
+}
+body.reading-theme-light{
+    background-color:whitesmoke !important;
+    color:black !important;
+    accent-color: auto;
+}
+body.reading-theme-wheat{
+    background-color: wheat !important;
+    color:black !important;
+    accent-color: auto;
+}
+body.reading-theme-sky{
+    background-color:skyblue !important;
+    color:black !important;
+    accent-color: auto;
+}
+body.reading-theme-lime{
+    background-color:limegreen !important;
+    color:black !important;
+    accent-color: auto;
+}

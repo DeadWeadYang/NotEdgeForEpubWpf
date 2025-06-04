@@ -1,0 +1,44 @@
+::highlight(rainbow-color-pink) {
+  background-color: pink;
+}
+::highlight(rainbow-color-orange) {
+  background-color: orange;
+}
+::highlight(rainbow-color-yellow) {
+  background-color: yellow;
+}
+::highlight(rainbow-color-green) {
+  background-color: green;
+}
+::highlight(rainbow-color-blue) {
+  background-color: blue;
+}
+::highlight(rainbow-color-purple) {
+  background-color: purple;
+}
+
+.annotation_button_container {
+      display: inline-block;
+      position: relative; /* Establishes the positioning context */
+      width: 0; /* No width so it won't push surrounding text */
+      height: 0; /* No height either */
+    }
+button.annotation_button{
+  
+  user-select: none;
+  position:absolute;
+  transform: translate(-60%,-30%);
+  /* top:-2.5em; */
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.annotation_button  img {
+  width: 0.8em;
+  height: 0.8em;
+  object-fit: contain;
+  display: inline-block;
+}

@@ -1,0 +1,142 @@
+﻿<UserControl x:Class="NotEdgeForEpubWpf.Views.BookViewControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NotEdgeForEpubWpf.Views"
+             x:Name="root"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" 
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" 
+             xmlns:viewmodels="clr-namespace:NotEdgeForEpubWpf.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:BookViewModel}"
+             mc:Ignorable="d" >
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Light" />
+                <ui:ControlsDictionary />
+                <ResourceDictionary Source="/Resource/SquareToolBar.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+
+    <Grid 	>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Grid x:Name="BookContentGrid"  Grid.Row="1">
+            <local:HtmlContentViewControl 
+                NavHandler="{Binding ViewModel.NavigateUriProperty,ElementName=root}"  
+                ViewModel="{Binding ViewModel.CurrentHTML, ElementName=root}"  
+                NoFlyoutOpened="{Binding ViewModel.NoFlyoutOpened,ElementName=root}"/>
+
+
+            <local:NavigationFlyoutControl x:Name="Nav_FlyoutControl"
+                    ViewModel="{Binding ViewModel.NavFlyout, ElementName=root}" 
+                    IsOpen="{Binding IsChecked, ElementName=NavigationFlyoutButton, Mode=TwoWay}"
+                    MaxHeight="{Binding ActualHeight, ElementName=BookContentGrid, Mode=OneWay}"
+                    Placement="Bottom" VerticalAlignment="Top" HorizontalAlignment="Left"
+                />
+            <local:CSSFlyoutControl  x:Name="StyleCSS_FlyoutControl"
+                    ViewModel="{Binding ViewModel.StyleCSSFlyout,ElementName=root}"
+                    IsOpen="{Binding IsChecked, ElementName=CSS_StyleFlyoutButton, Mode=TwoWay}"
+                    MaxHeight="{Binding ActualHeight, ElementName=BookContentGrid, Mode=OneWay}"
+                    Placement="Bottom" VerticalAlignment="Top" HorizontalAlignment="Right"
+                />
+
+            <local:AnnotationEditFakePopup x:Name="AnnotationEditControl"
+                ViewModel="{Binding ViewModel.AnnotationEdit,ElementName=root}"
+                HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            <local:SaveAsFlyoutControl x:Name="SaveAs_FlyoutControl"
+                  ViewModel="{Binding ViewModel.SaveAsVM,ElementName=root}"
+                   IsOpen="{Binding IsChecked,ElementName=SaveAsFlyoutButton,Mode=TwoWay}"      
+                  MaxHeight="{Binding ActualHeight, ElementName=BookContentGrid, Mode=OneWay}"      
+                    Placement="Bottom" VerticalAlignment="Top" HorizontalAlignment="Right"       
+             />
+        </Grid>
+        
+        
+        <Grid x:Name="TopBarGrid"  Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ToolBarTray Background="Gray" IsLocked="True" Grid.Column="0" >
+                <ToolBar Style="{StaticResource SquareToolBarNoOverflow}" ToolBarTray.IsLocked="True" >
+                    <ToggleButton x:Name="NavigationFlyoutButton"
+                        Style="{StaticResource SquareToolBarToggleButtonStyle}">
+                        <ui:SymbolIcon Symbol="TextBulletListLtr24" Filled="True" FontSize="20" Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type ContentPresenter}}}"/>
+                    </ToggleButton>
+                    <!--<ToggleButton Style="{StaticResource SquareToolBarToggleButtonStyle}">
+                        <ui:SymbolIcon Symbol="Search24" Filled="True" FontSize="20" Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type ContentPresenter}}}"/>
+                    </ToggleButton>-->
+                </ToolBar>
+            </ToolBarTray>
+
+            <Grid Background="Gray" Grid.Column="1" >
+                <!--<Button HorizontalAlignment="Center">
+                    <ui:SymbolIcon Symbol="BookmarkAdd24"/>
+                </Button>-->
+            </Grid>
+                <!--<ToolBar Grid.Column="1" ToolBarTray.IsLocked="True" Background="Gray" Style="{StaticResource SquareToolBarNoOverflow}" >
+                    <Button>
+                        <ui:SymbolIcon Symbol="BookmarkAdd24"/>
+                    </Button>
+                </ToolBar>-->
+
+                <ToolBarTray Background="Gray" IsLocked="True" Grid.Column="2">
+                <ToolBar  Style="{StaticResource SquareToolBarNoOverflow}" ToolBarTray.IsLocked="True">
+                    <ToggleButton x:Name="CSS_StyleFlyoutButton"
+                        Style="{StaticResource SquareToolBarToggleButtonStyle}" >
+                        <ui:SymbolIcon Symbol="TextFontSize24" Filled="True" FontSize="20"/>
+                    </ToggleButton>
+                    <ToggleButton x:Name="SaveAsFlyoutButton"
+                        Style="{StaticResource SquareToolBarToggleButtonStyle}" >
+                        <ui:SymbolIcon Symbol="Save24" Filled="True" FontSize="20"/>
+                    </ToggleButton>
+                </ToolBar>
+            </ToolBarTray>
+        </Grid>
+
+
+        
+        <Grid x:Name="BottomBarGrid" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ToolBarTray Background="Gray" IsLocked="True" Grid.Column="0" >
+                <ToolBar Style="{StaticResource SquareToolBarNoOverflow}" ToolBarTray.IsLocked="True" >
+                    <Button x:Name="GoPrevButton" Style="{StaticResource SquareToolBarButtonStyle}"
+                            Command="{Binding ViewModel.NavigateToPrevCommand,ElementName=root}"
+                            Height="{Binding ActualHeight,ElementName=BottomBarGrid}">
+                        <ui:SymbolIcon Symbol="TriangleLeft12"  FontSize="20"/>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+            <Grid Background="Gray" Grid.Column="1">
+                <StackPanel Orientation="Vertical">
+                    <Slider x:Name="ReadingProgressBar" HorizontalAlignment="Stretch" Margin="5" Minimum="0" Maximum="100" 
+                            Value="{Binding ViewModel.BookProgressService.OverallProgress,ElementName=root,Mode=TwoWay}"/>
+                    <TextBlock Text="{Binding Value,ElementName=ReadingProgressBar , StringFormat={}{0:N0}%}" HorizontalAlignment="Center" Padding="0,0,0,10"/>
+                </StackPanel>
+            </Grid>
+            <ToolBarTray Background="Gray" IsLocked="True" Grid.Column="2">
+                <ToolBar  Style="{StaticResource SquareToolBarNoOverflow}" ToolBarTray.IsLocked="True">
+                    <Button x:Name="GoNextButton" Style="{StaticResource SquareToolBarButtonStyle}"
+                            Command="{Binding ViewModel.NavigateToNextCommand,ElementName=root}"
+                            Height="{Binding ActualHeight,ElementName=BottomBarGrid}">
+                        <ui:SymbolIcon Symbol="TriangleRight12"  FontSize="20"/>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+        </Grid>
+    </Grid>
+</UserControl>

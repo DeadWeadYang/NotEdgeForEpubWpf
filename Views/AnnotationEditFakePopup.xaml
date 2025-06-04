@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="NotEdgeForEpubWpf.Views.AnnotationEditFakePopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NotEdgeForEpubWpf.Views"
+             mc:Ignorable="d" 
+             x:Name="root"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="LightGray" Visibility="{Binding ViewModel.PopupVisibility,ElementName=root}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ui:CardControl Background="SlateGray"  Grid.Row="0" Margin="0" Padding="0" BorderThickness="0" CornerRadius="0">
+            <Button Background="Transparent"  HorizontalAlignment="Right" Command="{Binding ViewModel.AnnotationTextSubmitCommand,ElementName=root}">
+                <ui:SymbolIcon Symbol="Checkmark12" Foreground="LightGoldenrodYellow"/>
+            </Button>
+        </ui:CardControl>
+
+        <TextBox Style="{x:Null}" Background="Transparent" Grid.Row="1" Padding="5" Height="150" Width="300"
+                TextWrapping="Wrap"  AcceptsReturn="True"  VerticalScrollBarVisibility="Auto" BorderThickness="0" 
+                Text="{Binding ViewModel.AnnotationText,ElementName=root,Mode=TwoWay}"
+         />
+        <ui:CardControl Background="SlateGray" Grid.Row="2" Margin="0" Padding="0" BorderThickness="0" CornerRadius="0">
+            <Button Background="Transparent" HorizontalAlignment="Right" Command="{Binding ViewModel.AnnotationDeleteCommand,ElementName=root}">
+                <ui:SymbolIcon Symbol="Delete12" Foreground="LightGoldenrodYellow"/>
+            </Button>
+        </ui:CardControl>
+
+    </Grid>
+</UserControl>
