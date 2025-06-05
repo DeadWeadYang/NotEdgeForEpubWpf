@@ -64,7 +64,7 @@ namespace NotEdgeForEpubWpf.ViewModels
         //}
         private void ClearState(NavigationNestItem node)
         {
-            node.IsExpanded = false;
+            //node.IsExpanded = false;
             node.IsSelected = false;
             foreach(var child in node.NestItems)
             {

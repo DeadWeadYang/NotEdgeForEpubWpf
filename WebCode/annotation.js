@@ -35,7 +35,7 @@ class Validatable {
    */
   static fromObject(obj) {
     const instance = new this();
-
+      console.log(obj);
     for (const key of Object.keys(obj)) {
       const value = obj[key];
 
@@ -58,10 +58,13 @@ class Validatable {
             safePropertySet(instance, key, nested);
 
         }
-        //else if (checkSubClass(Validatable, instance.constructor.metaPropertyInfo[key])) {
-        //    const nested = instance.constructor.metaPropertyInfo[key].fromObject(value);
-        //    safePropertySet(instance, key, nested);
-        //}
+        else if (checkSubClass(Validatable, instance.constructor.metaPropertyInfo[key])) {
+            console.log(key + "###1");
+            console.log(instance.constructor.metaPropertyInfo[key]);
+            const nested = instance.constructor.metaPropertyInfo[key].fromObject(value);
+            console.log(key + "###2")
+            safePropertySet(instance, key, nested);
+        }
         else {
           //instance[key] = value;
           safePropertySet(instance, key, value);
@@ -131,7 +134,7 @@ class RangeOffsetSelector extends Validatable {
     static fromObject(obj) {
         if (obj.type !== this.type
             || (
-                (typeof value !== "number")
+                (typeof obj.value !== "number")
                 // && ( (typeof value !== "string")
                 //     || (value!=="before" && value!=="after")
                 // )
@@ -186,8 +189,8 @@ class RangeSelector extends Validatable {
     }
     static fromObject(obj) {
         if (obj.type !== this.type
-            || obj.startContainer === undefined
-            || obj.endContainer === undefined
+            || obj.startSelector === undefined
+            || obj.endSelector === undefined
         ) return null;
         return super.fromObject(obj);
     }

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using NotEdgeForEpubWpf.Models;
 using NotEdgeForEpubWpf.Models.AnnotationModel;
 using Raven.Client.Documents;
@@ -99,10 +100,10 @@ namespace NotEdgeForEpubWpf.ViewModels
             if (result == true)
             {
                 string filePath = saveFileDialog.FileName;
-                File.WriteAllText(filePath, JsonSerializer.Serialize(annSet, new JsonSerializerOptions
+                File.WriteAllText(filePath, JsonConvert.SerializeObject(annSet, new JsonSerializerSettings
                 {
-                    WriteIndented = true,
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = Formatting.Indented  // optional: for readable output
                 }));
             }
         }
@@ -122,6 +123,11 @@ namespace NotEdgeForEpubWpf.ViewModels
             if (result == true)
             {
                 string filePath = saveFileDialog.FileName;
+                if (File.Exists(filePath))
+                {
+                    Console.WriteLine("Target archive exists. Deleting it.");
+                    File.Delete(filePath);
+                }
                 ZipFile.CreateFromDirectory(bookModel.cachePathExtracted, filePath);
                 if(anns.Count > 0)
                 {
@@ -133,10 +139,10 @@ namespace NotEdgeForEpubWpf.ViewModels
                             ZipArchiveEntry readmeEntry = archive.CreateEntry("META-INF/annotations.ann");
                             using (StreamWriter writer = new StreamWriter(readmeEntry.Open()))
                             {
-                                writer.Write(JsonSerializer.Serialize(annSet, new JsonSerializerOptions
+                                writer.Write(JsonConvert.SerializeObject(annSet, new JsonSerializerSettings
                                 {
-                                    WriteIndented = true,
-                                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                                    NullValueHandling = NullValueHandling.Ignore,
+                                    Formatting = Formatting.Indented  // optional: for readable output
                                 }));
                             }
                         }

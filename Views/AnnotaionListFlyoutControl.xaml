@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="NotEdgeForEpubWpf.Views.AnnotaionListFlyoutControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NotEdgeForEpubWpf.Views"
+             mc:Ignorable="d" 
+             x:Name="root"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resource/SquareFlyout.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+    </UserControl.Resources>
+    <Grid x:Name="NavWrapGrid" Height="0" Width="{Binding ActualWidth,ElementName=FlyoutContentWraper,Mode=OneWay}"
+      VerticalAlignment="{Binding VerticalAlignment,ElementName=root}"
+      HorizontalAlignment="{Binding HorizontalAlignment,ElementName=root}">
+
+        <ui:Flyout  Style="{StaticResource SquareFlyoutStyle}" BorderThickness="0"
+        x:Name="AnnoFlyout" IsOpen="{Binding IsOpen,ElementName=root, Mode=TwoWay}"  Placement="{Binding Placement,ElementName=root}" >
+            <Grid x:Name="FlyoutContentWraper">
+                
+            </Grid>
+        </ui:Flyout>
+    </Grid>
+</UserControl>

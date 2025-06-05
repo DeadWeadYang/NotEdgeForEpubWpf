@@ -24,12 +24,12 @@ namespace NotEdgeForEpubWpf.ViewModels
         public readonly IDocumentStore dataBase;
         public string Id {  get; set; }
 
-        public bool IsBookmark { get; set; } = false;
+        //public bool IsBookmark { get; set; } = false;
 
         public Action<string>? delAnnotationCallback;
         public void ShowAnnotationEdit(string id)
         {
-            Id = id;IsBookmark = false;
+            Id = id;//IsBookmark = false;
             using var session = dataBase.OpenSession();
             var anno = session.Load<Annotation>(id);
             if (anno == null) return;
@@ -45,20 +45,20 @@ namespace NotEdgeForEpubWpf.ViewModels
             this.PopupVisibility = Visibility.Collapsed;
             this.IsOpen = false;
             using var session = dataBase.OpenSession();
-            if (IsBookmark)
-            {
-                var anno = session.Load<AnnotationBookmark>(Id);
-                if (anno == null) return;
-                if (anno.Body != null)
-                {
-                    anno.Body.Value = AnnotationText;
-                }
-                else
-                {
-                    anno.Body = new(AnnotationText);
-                }
-            }
-            else
+            //if (IsBookmark)
+            //{
+            //    var anno = session.Load<AnnotationBookmark>(Id);
+            //    if (anno == null) return;
+            //    if (anno.Body != null)
+            //    {
+            //        anno.Body.Value = AnnotationText;
+            //    }
+            //    else
+            //    {
+            //        anno.Body = new(AnnotationText);
+            //    }
+            //}
+            //else
             {
                 var anno = session.Load<Annotation>(Id);
                 if (anno == null) return;
@@ -84,13 +84,13 @@ namespace NotEdgeForEpubWpf.ViewModels
             this.IsOpen = false;
             delAnnotationCallback?.Invoke(Id);
             using var session = dataBase.OpenSession();
-            if (IsBookmark)
-            {
-                var anno = session.Load<AnnotationBookmark>(Id);
-                if (anno == null) return;
-                session.Delete(anno);
-            }
-            else
+            //if (IsBookmark)
+            //{
+            //    var anno = session.Load<AnnotationBookmark>(Id);
+            //    if (anno == null) return;
+            //    session.Delete(anno);
+            //}
+            //else
             {
                 var anno = session.Load<Annotation>(Id);
                 if (anno == null) return;

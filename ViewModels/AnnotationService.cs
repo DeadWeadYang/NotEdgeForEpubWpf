@@ -1,16 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
+using NotEdgeForEpubWpf.Models.AnnotationModel;
 using NotEdgeForEpubWpf.Utils;
 using Raven.Client.Documents;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using NotEdgeForEpubWpf.Models.AnnotationModel;
-using System.IO;
-using System.Text.Json;
 
 namespace NotEdgeForEpubWpf.ViewModels
 {
@@ -50,7 +50,7 @@ namespace NotEdgeForEpubWpf.ViewModels
         }
         public string GetAnnotationsJSON()
         {
-            return JsonSerializer.Serialize(annotations);
+            return JsonConvert.SerializeObject(annotations);
         }
         public void RegisterToWebView(CoreWebView2 webView2)
         {
@@ -71,7 +71,8 @@ namespace NotEdgeForEpubWpf.ViewModels
         public async Task MakeAnnotation(string color="yellow")
         {
             if (this.webView2 == null) return;
-            string rsJSON = await this.webView2.ExecuteScriptAsync("getSelectionRangeSelector();");
+            string rsJSON = await this.webView2.ExecuteScriptAsync("JSON.stringify(getSelectionRangeSelector());");
+            rsJSON= JsonConvert.DeserializeObject<string>(rsJSON);
             if (rsJSON == null) return;
             var rangeSelector = RangeSelector.FromJSON(rsJSON);
             if(rangeSelector == null) return; 
@@ -90,7 +91,7 @@ namespace NotEdgeForEpubWpf.ViewModels
                 session.Store(anno);
                 session.SaveChanges();
             }
-            string jsscript = $"addAnnotation(Annotation.fromObject(JSON.parse('{anno.ToJSON()}')));";
+            string jsscript = $"addAnnotation(Annotation.fromObject({anno.ToJSON()}));";
             await this.webView2.ExecuteScriptAsync(jsscript);
             openAnnotaionEditCallback?.Invoke(anno.Id);
         }

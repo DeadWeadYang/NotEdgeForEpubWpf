@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
 using NotEdgeForEpubWpf.Models;
 using NotEdgeForEpubWpf.Models.AnnotationModel;
 using NotEdgeForEpubWpf.Utils;
@@ -188,7 +189,7 @@ namespace NotEdgeForEpubWpf.ViewModels
                 var tag = session.Load<InitTag>(bookModel.bookHash);
                 if (tag == null)
                 {
-                    var aset = JsonSerializer.Deserialize<AnnotationSet>(File.ReadAllText(Path.Combine(bookModel.cachePathExtracted, "META-INF/annotations.ann")));
+                    var aset = JsonConvert.DeserializeObject<AnnotationSet>(File.ReadAllText(Path.Combine(bookModel.cachePathExtracted, "META-INF/annotations.ann")));
                     if(aset != null)
                     {
                         session.Store(new InitTag(bookModel.bookHash));
