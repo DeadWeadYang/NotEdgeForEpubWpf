@@ -11,8 +11,7 @@
              xmlns:viewmodels="clr-namespace:NotEdgeForEpubWpf.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:HtmlContentViewModel}">
     <Grid>
         <wv2:WebView2CompositionControl x:Name="webView2"
-                   IsHitTestVisible="{Binding NoFlyoutOpened,ElementName=root}"
-                   Focusable="{Binding NoFlyoutOpened,ElementName=root}"
+                   Focusable="{Binding NoFlyoutOpened,ElementName=root,Mode=TwoWay}"
          />
     </Grid>
 </UserControl>
