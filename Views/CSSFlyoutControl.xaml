@@ -57,7 +57,7 @@
                                            AcceptsReturn="False"
                                            Text="{Binding ViewModel.TextofFontSizeScale,ElementName=root,Mode=TwoWay}"   
                                             PlaceholderText="{Binding ViewModel.CssStyleService.FontSizeScale,ElementName=root, StringFormat={}{0:N0}}"
-                                        PreviewKeyDown="FontSizeTextBocPreviewKeyDown"  >
+                                        PreviewKeyDown="FontSizeTextBoxPreviewKeyDown"  >
                                 <!-- Trigger the command when the TextBox loses focus -->
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="LostFocus">

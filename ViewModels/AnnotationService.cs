@@ -86,6 +86,7 @@ namespace NotEdgeForEpubWpf.ViewModels
             DateTimeOffset nowWithOffset = DateTimeOffset.Now;
             string iso8601WithOffset = nowWithOffset.ToString("o");
             anno.Creadted = iso8601WithOffset;
+            anno.Modified = iso8601WithOffset;
             using (var session=this.dataBase.OpenSession())
             {
                 session.Store(anno);

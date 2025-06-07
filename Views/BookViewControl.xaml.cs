@@ -46,7 +46,7 @@ namespace NotEdgeForEpubWpf.Views
         {
             if (ViewModel != null)
             {
-                ViewModel.NoFlyoutOpened = !Nav_FlyoutControl.IsOpen && !StyleCSS_FlyoutControl.IsOpen && !AnnotationEditControl.ViewModel.IsOpen;
+                ViewModel.NoFlyoutOpened = !Nav_FlyoutControl.IsOpen && !StyleCSS_FlyoutControl.IsOpen && !AnnotationEditControl.ViewModel.IsOpen &&!AnnoList_FlyoutControl.IsOpen;
             }
         }
 
@@ -67,6 +67,11 @@ namespace NotEdgeForEpubWpf.Views
             {
                 descriptor.AddValueChanged(AnnotationEditControl, UpdateAnyFlyoutOpened);
             }
+            descriptor = DependencyPropertyDescriptor.FromProperty(AnnotaionListFlyoutControl.IsOpenProperty, typeof(AnnotaionListFlyoutControl));
+            if (descriptor != null)
+            {
+                descriptor.AddValueChanged(AnnoList_FlyoutControl, UpdateAnyFlyoutOpened);
+            }
         }
         private void Control_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -84,6 +89,11 @@ namespace NotEdgeForEpubWpf.Views
             if (descriptor != null)
             {
                 descriptor.RemoveValueChanged(AnnotationEditControl, UpdateAnyFlyoutOpened);
+            }
+            descriptor = DependencyPropertyDescriptor.FromProperty(AnnotaionListFlyoutControl.IsOpenProperty, typeof(AnnotaionListFlyoutControl));
+            if (descriptor != null)
+            {
+                descriptor.RemoveValueChanged(AnnoList_FlyoutControl, UpdateAnyFlyoutOpened);
             }
         }
 

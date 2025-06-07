@@ -4,27 +4,318 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NotEdgeForEpubWpf.Views"
+             xmlns:vm="clr-namespace:NotEdgeForEpubWpf.ViewModels"
              mc:Ignorable="d" 
              x:Name="root"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" 
+              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Resource/SquareFlyout.xaml" />
+                <ResourceDictionary Source="/Resource/ToggleSwitchHack.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 
     </UserControl.Resources>
-    <Grid x:Name="NavWrapGrid" Height="0" Width="{Binding ActualWidth,ElementName=FlyoutContentWraper,Mode=OneWay}"
+    <Grid x:Name="AnnoListWrapGrid" Height="0" Width="{Binding ActualWidth,ElementName=FlyoutContentWraper,Mode=OneWay}"
       VerticalAlignment="{Binding VerticalAlignment,ElementName=root}"
       HorizontalAlignment="{Binding HorizontalAlignment,ElementName=root}">
 
         <ui:Flyout  Style="{StaticResource SquareFlyoutStyle}" BorderThickness="0"
         x:Name="AnnoFlyout" IsOpen="{Binding IsOpen,ElementName=root, Mode=TwoWay}"  Placement="{Binding Placement,ElementName=root}" >
-            <Grid x:Name="FlyoutContentWraper">
-                
+            <Grid x:Name="FlyoutContentWraper" MaxHeight="{Binding MaxHeight,ElementName=root,Mode=OneWay}">
+                <TabControl >
+                    <TabItem IsSelected="True">
+                        <TabItem.Header>
+                            <ui:TextBlock>
+                                <ui:SymbolIcon Symbol="DocumentText24"/> Annotations
+                            </ui:TextBlock>
+                        </TabItem.Header>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <ui:CardControl Grid.Row="0" Padding="5" Margin="0">
+                                <ui:CardControl.Header>
+                                    <ui:TextBlock
+                                    Margin="0"
+                                    FontTypography="BodyStrong"
+                                    Text="Annotation Search"
+                                    TextWrapping="WrapWithOverflow" />
+                                </ui:CardControl.Header>
+                                <Grid>
+                                    <ui:TextBox x:Name="AnnotationSearchBox"
+                                           Padding="5,5,40,5"
+                                           VerticalContentAlignment="Center"
+                                           Width="350" 
+                                           AcceptsReturn="False"
+                                           Text="{Binding ViewModel.AnnotaionSearchText,ElementName=root,Mode=TwoWay}"   
+                                            PlaceholderText="{Binding ViewModel.AnnotaionSearchedText,ElementName=root}"
+                                            PreviewKeyDown="AnnotaionSearchTextBoxPreviewKeyDown"  >
+                                        <!-- Trigger the command when the TextBox loses focus -->
+                                        <!--<i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="LostFocus">
+                                                <i:InvokeCommandAction Command="{Binding ViewModel.CancelChangingAnnotationSearchCommand,ElementName=root}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>-->
+                                    </ui:TextBox>
+                                    <ui:Button
+                                     Margin="0,0,0,0"
+                                     VerticalAlignment="Center"
+                                        HorizontalAlignment="Right"
+                                        BorderThickness="1"
+                                        Command="{Binding ViewModel.SubmitAnnotationSearchCommand,ElementName=root}"
+                                     FontSize="{Binding ElementName=AnnotationSearchBox, Path=FontSize}"
+                                     Foreground="Black">
+                                        <ui:SymbolIcon Symbol="Search24"/>
+                                    </ui:Button>
+                                </Grid>
+                            </ui:CardControl>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <ui:CardControl Grid.Column="0" Padding="5" Margin="0">
+                                    <ui:CardControl.Header>
+                                        <ui:TextBlock
+                                        Margin="0"
+                                        FontTypography="BodyStrong"
+                                        Text="Color Filter"
+                                        TextWrapping="WrapWithOverflow" />
+                                    </ui:CardControl.Header>
+                                    <ComboBox
+                                        Width="100"
+                                        HorizontalAlignment="Left"
+                                        SelectedIndex="{Binding ViewModel.ColorFilterChoiceIndex,ElementName=root,Mode=TwoWay}">
+                                        <ComboBoxItem Content="All"/>
+                                        <ComboBoxItem Content="Yellow"/>
+                                        <ComboBoxItem Content="Pink"/>
+                                        <ComboBoxItem Content="Blue"/>
+                                        <ComboBoxItem Content="Green"/>
+                                    </ComboBox>
+                                </ui:CardControl>
+
+                                <ui:CardControl Grid.Column="1" Padding="5" Margin="0">
+                                    <ui:CardControl.Header>
+                                        <ui:TextBlock
+                                            Margin="0"
+                                            FontTypography="BodyStrong"
+                                            Text="Sorting Order"
+                                            TextWrapping="WrapWithOverflow" />
+                                    </ui:CardControl.Header>
+                                    <StackPanel Orientation="Horizontal" >
+                                        <ui:ToggleSwitch Style="{StaticResource HackedUiToggleSwitchStyle}" IsChecked="{Binding ViewModel.IsAscendingAnnotation ,ElementName=root,Mode=TwoWay}" 
+                                                         OnContent="{ui:SymbolIcon Symbol=CaretUp20}" OffContent="{ui:SymbolIcon Symbol=CaretDown20}"/>
+                                        <ComboBox
+                                        Background="White"
+                                        Width="150"
+                                        SelectedIndex="{Binding ViewModel.AnnotationSortingChoice,ElementName=root,Mode=TwoWay}"
+                                        HorizontalAlignment="Right">
+                                            <ComboBoxItem Content="Created Time"/>
+                                            <ComboBoxItem Content="Modified Time"/>
+                                            <ComboBoxItem Content="Chapter Index"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </ui:CardControl>
+                            </Grid>
+                            
+
+                            <ui:ListView ItemsSource="{Binding ViewModel.AnnotationItemsView,ElementName=root}" Grid.Row="2"
+                                VirtualizingStackPanel.ScrollUnit="Pixel" 
+                                VirtualizingStackPanel.IsVirtualizing="True"
+                                VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                ScrollViewer.CanContentScroll="True">
+                                <ui:ListView.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:AnnotationListViewItem}">
+                                        <StackPanel Margin="2"  Width="500" Orientation="Horizontal">
+                                            <StackPanel  Width="450" HorizontalAlignment="Left">
+                                                <Grid >
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                        <ui:TextBlock Background="Transparent" Text="Title: "/>
+                                                        <ScrollViewer HorizontalScrollBarVisibility="Auto" Width="180">
+                                                            <ui:TextBlock Background="Transparent" Text="{Binding Title}"/>
+                                                        </ScrollViewer>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                        <ui:TextBlock Background="Transparent" Text="Color: "/>
+                                                        <ui:TextBlock Background="Transparent" Text="{Binding Color}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                                <Separator/>
+                                                <ScrollViewer MaxHeight="80" VerticalScrollBarVisibility="Visible">
+                                                    <ui:TextBlock TextWrapping="Wrap" Background="Transparent" Text="{Binding Text}"/>
+                                                </ScrollViewer>
+                                                <Separator/>
+                                                <Grid  >
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0"  Orientation="Horizontal" Margin="3,0">
+                                                        <ui:TextBlock Background="Transparent" Text="Created: "/>
+                                                        <ScrollViewer HorizontalScrollBarVisibility="Auto" Width="180">
+                                                            <ui:TextBlock TextWrapping="NoWrap" Background="Transparent" Text="{Binding CreatedTimeString}"/>
+                                                        </ScrollViewer>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="3,0">
+                                                        <ui:TextBlock Background="Transparent" Text="Modified: "/>
+                                                        <ScrollViewer HorizontalScrollBarVisibility="Auto" Width="180">
+                                                            <ui:TextBlock TextWrapping="NoWrap" Background="Transparent" Text="{Binding ModifiedTimeString}"/>
+                                                        </ScrollViewer>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                            <Separator/>
+                                            <ui:Button VerticalAlignment="Stretch" Icon="{ui:SymbolIcon Symbol=HighlightLink20}" 
+                                                       Command="{Binding ViewModel.TryAnnotationNavigateCommand,RelativeSource={RelativeSource AncestorType={x:Type local:AnnotaionListFlyoutControl}}}"
+                                                       CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ui:ListView.ItemTemplate>
+                            </ui:ListView>
+                            
+                        </Grid>
+                    </TabItem>
+                    <TabItem>
+                        <TabItem.Header>
+                            <ui:TextBlock>
+                                <ui:SymbolIcon Symbol="BookmarkMultiple24"/> Bookmarks
+                            </ui:TextBlock>
+                        </TabItem.Header>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <ui:CardControl Grid.Row="0" Padding="5" Margin="0">
+                                <ui:CardControl.Header>
+                                    <ui:TextBlock
+                                    Margin="0"
+                                    FontTypography="BodyStrong"
+                                    Text="Bookmark Search"
+                                    TextWrapping="WrapWithOverflow" />
+                                </ui:CardControl.Header>
+                                <Grid>
+                                    <ui:TextBox x:Name="BookmarkSearchBox"
+                                           Padding="5,5,40,5"
+                                           VerticalContentAlignment="Center"
+                                           Width="350" 
+                                           AcceptsReturn="False"
+                                           Text="{Binding ViewModel.BookmarkSearchText,ElementName=root,Mode=TwoWay}"   
+                                            PlaceholderText="{Binding ViewModel.BookmarkSearchedText,ElementName=root}"
+                                            PreviewKeyDown="BookmarkSearchTextBoxPreviewKeyDown"  >
+                                        <!-- Trigger the command when the TextBox loses focus -->
+                                        <!--<i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="LostFocus">
+                                                <i:InvokeCommandAction Command="{Binding ViewModel.CancelChangingAnnotationSearchCommand,ElementName=root}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>-->
+                                    </ui:TextBox>
+                                    <ui:Button
+                                     Margin="0,0,0,0"
+                                     VerticalAlignment="Center"
+                                        HorizontalAlignment="Right"
+                                        BorderThickness="1"
+                                        Command="{Binding ViewModel.SubmitBookmarkSearchCommand,ElementName=root}"
+                                     FontSize="{Binding ElementName=BookmarkSearchBox, Path=FontSize}"
+                                     Foreground="Black">
+                                        <ui:SymbolIcon Symbol="Search24"/>
+                                    </ui:Button>
+                                </Grid>
+                            </ui:CardControl>
+
+                            <Grid Grid.Row="1">
+                                <ui:CardControl  Padding="5" Margin="0">
+                                    <ui:CardControl.Header>
+                                        <ui:TextBlock
+                                            Margin="0"
+                                            FontTypography="BodyStrong"
+                                            Text="Sorting Order"
+                                            TextWrapping="WrapWithOverflow" />
+                                    </ui:CardControl.Header>
+                                    <StackPanel Orientation="Horizontal" >
+                                        <ui:ToggleSwitch Style="{StaticResource HackedUiToggleSwitchStyle}" IsChecked="{Binding ViewModel.IsAscendingBookmark ,ElementName=root,Mode=TwoWay}" 
+                                                         OnContent="{ui:SymbolIcon Symbol=CaretUp20}" OffContent="{ui:SymbolIcon Symbol=CaretDown20}"/>
+                                        <ComboBox
+                                        Background="White"
+                                        Width="150"
+                                        SelectedIndex="{Binding ViewModel.BookmarkSortingChoice,ElementName=root,Mode=TwoWay}"
+                                        HorizontalAlignment="Right">
+                                            <ComboBoxItem Content="Created Time"/>
+                                            <ComboBoxItem Content="Modified Time"/>
+                                            <ComboBoxItem Content="Chapter Index"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </ui:CardControl>
+                            </Grid>
+
+
+                            <ui:ListView ItemsSource="{Binding ViewModel.BookmarkItemsView,ElementName=root}" Grid.Row="2"
+                                VirtualizingStackPanel.ScrollUnit="Pixel" 
+                                VirtualizingStackPanel.IsVirtualizing="True"
+                                VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                ScrollViewer.CanContentScroll="True">
+                                <ui:ListView.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:BookmarkListViewItem}">
+                                        <StackPanel Margin="2"  Width="500" Orientation="Horizontal">
+                                            <StackPanel  Width="450" HorizontalAlignment="Left">
+                                                <Grid >
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <ui:TextBlock Background="Transparent" Text="Title: "/>
+                                                        <ScrollViewer HorizontalScrollBarVisibility="Auto" Width="400">
+                                                            <ui:TextBlock Background="Transparent" Text="{Binding Title}"/>
+                                                        </ScrollViewer>
+                                                    </StackPanel>
+                                                </Grid>
+                                                <Separator/>
+                                                <ScrollViewer MaxHeight="80" VerticalScrollBarVisibility="Visible">
+                                                    <ui:TextBlock TextWrapping="Wrap" Background="Transparent" Text="{Binding Text}"/>
+                                                </ScrollViewer>
+                                                <Separator/>
+                                                <Grid  >
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0"  Orientation="Horizontal" Margin="3,0">
+                                                        <ui:TextBlock Background="Transparent" Text="Created: "/>
+                                                        <ScrollViewer HorizontalScrollBarVisibility="Auto" Width="180">
+                                                            <ui:TextBlock TextWrapping="NoWrap" Background="Transparent" Text="{Binding CreatedTimeString}"/>
+                                                        </ScrollViewer>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="3,0">
+                                                        <ui:TextBlock Background="Transparent" Text="Modified: "/>
+                                                        <ScrollViewer HorizontalScrollBarVisibility="Auto" Width="180">
+                                                            <ui:TextBlock TextWrapping="NoWrap" Background="Transparent" Text="{Binding ModifiedTimeString}"/>
+                                                        </ScrollViewer>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                            <Separator/>
+                                            <ui:Button VerticalAlignment="Stretch" Icon="{ui:SymbolIcon Symbol=HighlightLink20}" 
+                                                       Command="{Binding ViewModel.TryBookmarkNavigateCommand,RelativeSource={RelativeSource AncestorType={x:Type local:AnnotaionListFlyoutControl}}}"
+                                                       CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ui:ListView.ItemTemplate>
+                            </ui:ListView>
+
+                        </Grid>
+                    </TabItem>
+                </TabControl>
             </Grid>
         </ui:Flyout>
     </Grid>

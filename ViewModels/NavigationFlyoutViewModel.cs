@@ -34,6 +34,16 @@ namespace NotEdgeForEpubWpf.ViewModels
             }
             return result;
         }
+        public Dictionary<string,string> GetTitleDict(Dictionary<string, string>pathDict)
+        {
+            return pathDict.ToDictionary(kvp => kvp.Key,
+                kvp =>
+                {
+                    this.pathToItemLCA.TryGetValue(kvp.Value, out NavigationNestItem? it);
+                    return it?.Header ?? "";
+                }
+            );
+        }
         //private NavigationNestItem? GetLCA(NavigationNestItem node,string epubPath)
         //{
         //    NavigationNestItem? result = null;

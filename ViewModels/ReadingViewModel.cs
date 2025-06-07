@@ -27,6 +27,13 @@ namespace NotEdgeForEpubWpf.ViewModels
             try
             {
                 var newTab = await BookViewModel.BookViewModelFactoryFromZipPathAsync(bookPath);
+                foreach (var tab in bookTabs)
+                {
+                    if (tab.bookHash == newTab.bookHash)
+                    {
+                        SelectedBookTab = tab;return;
+                    }
+                }
                 BookTabs.Add(newTab);
                 SelectedBookTab= newTab;
             }

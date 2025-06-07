@@ -94,11 +94,13 @@ namespace NotEdgeForEpubWpf.ViewModels
         [RelayCommand]
         private void FontSizeScaleAddMinimal()
         {
+            CancelChangingFontSizeScale();
             CssStyleService.FontSizeScale += 5.0;
         }
         [RelayCommand]
         private void FontSizeScaleSubMinimal()
         {
+            CancelChangingFontSizeScale();
             CssStyleService.FontSizeScale -= 5.0;
         }
 

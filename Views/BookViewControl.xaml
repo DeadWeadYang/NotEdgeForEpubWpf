@@ -58,6 +58,13 @@
                   MaxHeight="{Binding ActualHeight, ElementName=BookContentGrid, Mode=OneWay}"      
                     Placement="Bottom" VerticalAlignment="Top" HorizontalAlignment="Right"       
              />
+
+            <local:AnnotaionListFlyoutControl x:Name="AnnoList_FlyoutControl"
+                                              ViewModel="{Binding ViewModel.AnnoListVM,ElementName=root}"
+                                              IsOpen="{Binding IsChecked,ElementName=AnnoListFlyoutButton,Mode=TwoWay}"
+                                              MaxHeight="{Binding ActualHeight, ElementName=BookContentGrid, Mode=OneWay}"      
+                                                Placement="Bottom" VerticalAlignment="Top" HorizontalAlignment="Left"       
+                                              />
         </Grid>
         
         
@@ -73,6 +80,10 @@
                         Style="{StaticResource SquareToolBarToggleButtonStyle}">
                         <ui:SymbolIcon Symbol="TextBulletListLtr24" Filled="True" FontSize="20" Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type ContentPresenter}}}"/>
                     </ToggleButton>
+                    <ToggleButton x:Name="AnnoListFlyoutButton"
+                        Style="{StaticResource SquareToolBarToggleButtonStyle}">
+                        <ui:SymbolIcon Symbol="BookmarkSearch24" Filled="True" FontSize="20" Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type ContentPresenter}}}"/>
+                    </ToggleButton>
                     <!--<ToggleButton Style="{StaticResource SquareToolBarToggleButtonStyle}">
                         <ui:SymbolIcon Symbol="Search24" Filled="True" FontSize="20" Foreground="{Binding Path=(TextElement.Foreground), RelativeSource={RelativeSource AncestorType={x:Type ContentPresenter}}}"/>
                     </ToggleButton>-->
@@ -80,9 +91,9 @@
             </ToolBarTray>
 
             <Grid Background="Gray" Grid.Column="1" >
-                <!--<Button HorizontalAlignment="Center">
+                <Button HorizontalAlignment="Center" Command="{Binding ViewModel.MakeBookmarkCommand,ElementName=root}">
                     <ui:SymbolIcon Symbol="BookmarkAdd24"/>
-                </Button>-->
+                </Button>
             </Grid>
                 <!--<ToolBar Grid.Column="1" ToolBarTray.IsLocked="True" Background="Gray" Style="{StaticResource SquareToolBarNoOverflow}" >
                     <Button>

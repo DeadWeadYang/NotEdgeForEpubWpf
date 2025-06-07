@@ -6,6 +6,7 @@ using NotEdgeForEpubWpf.Models;
 using NotEdgeForEpubWpf.Models.AnnotationModel;
 using NotEdgeForEpubWpf.Utils;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Indexes;
 using Raven.Embedded;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using VersOne.Epub;
+using Windows.Web.Http;
 
 namespace NotEdgeForEpubWpf.ViewModels
 {
@@ -121,11 +123,34 @@ namespace NotEdgeForEpubWpf.ViewModels
             CurrentHTML = htmlViewModel;
             CurrentHTML.progressService.SetProgress(htmlProgress);
         }
+        private void NavigateXPath(HtmlContentViewModel htmlViewModel, string? XPath)
+        {
+
+            IndexReadingOrder = readingOrderHTMLs.IndexOf(htmlViewModel);
+            CurrentHTML = htmlViewModel;
+            if (XPath != null)
+                CurrentHTML.progressService.GoXPath(XPath);
+            else
+                CurrentHTML.progressService.SetProgress(0);
+        }
         public bool NavigateUri(Uri uri)
         {
             if (uri == null ||!(uri.IsAbsoluteUri && uri.IsFile && uri.IsLoopback)) return false;
             if (!htmlViewModelDict.ContainsKey(uri.LocalPath)) return false;
             Navigate(htmlViewModelDict[uri.LocalPath],uri.Fragment);return true;
+        }
+        public bool NavigateSource(string htmlSource,double? htmlProgress=null)
+        {
+            if (!bookModel.htmlPathDict.ContainsKey(htmlSource)) return false;
+            var html = htmlViewModelDict[bookModel.htmlPathDict[htmlSource]];
+            Navigate(html,htmlProgress??0.0);return true;
+        }
+
+        public bool NavigateXPath(string htmlSource,string? XPath=null)
+        {
+            if (!bookModel.htmlPathDict.ContainsKey(htmlSource)) return false;
+            var html = htmlViewModelDict[bookModel.htmlPathDict[htmlSource]];
+            NavigateXPath(html, XPath);return true;
         }
 
         [ObservableProperty]
@@ -161,7 +186,7 @@ namespace NotEdgeForEpubWpf.ViewModels
         {
             if (!File.Exists(bookPath))
             {
-                throw new FileNotFoundException("Specified EPUB file not found.", bookPath);
+                throw new FileNotFoundException($"Specified EPUB file not found. Path: {bookPath}", bookPath);
             }
             //EpubBookRef bookRef = await EpubReader.OpenBookAsync(bookPath);
             EpubBookRef bookRef = EpubReader.OpenBook(bookPath);
@@ -174,6 +199,7 @@ namespace NotEdgeForEpubWpf.ViewModels
             try
             {
                 bookDataBase = await EmbeddedServer.Instance.GetDocumentStoreAsync(bookModel.bookHash);
+                //new Annotations_ByBodyText().Execute(bookDataBase);
             }
             catch (Exception ex)
             {
@@ -211,6 +237,11 @@ namespace NotEdgeForEpubWpf.ViewModels
 
         [ObservableProperty]
         private SaveAsViewModel saveAsVM;
+
+        public readonly Dictionary<string, string> htmlTitleDict;
+
+        [ObservableProperty]
+        private AnnotationListViewModel annoListVM;
         private BookViewModel(BookModel bookModel, EpubBookRef bookRef,IDocumentStore dataBase)
         {
             this.NoFlyoutOpened = true;
@@ -248,6 +279,12 @@ namespace NotEdgeForEpubWpf.ViewModels
                 );
             this.NavigateUriProperty=(uri)=>this.NavigateUri(uri);
             this.NavFlyout = new(bookModel.navigationItems);
+            this.htmlTitleDict = this.NavFlyout.GetTitleDict(this.bookModel.htmlPathDict);
+
+            this.annoListVM = new(this.htmlTitleDict,bookModel.readingOrderPairs, this.dataBase);
+            this.annoListVM.ProgressNavigateCallback += NavigateSource;
+            this.annoListVM.XPathNavigateCallback += NavigateXPath;
+
             this.NavFlyout.NavHandler = NavigateUri;
             //this.CurrentHtmlChangeCallback
             //    = (New, Old) => this.NavFlyout.SelectByPath(New.PathPair.PathAfterProcess);
@@ -269,6 +306,29 @@ namespace NotEdgeForEpubWpf.ViewModels
             }
             this.CurrentHTML = readingOrderHTMLs[IndexReadingOrder = 0];
         SkipNavToHead:;
+        }
+        [RelayCommand]
+        public void MakeBookmark()
+        {
+            var progressionSelector = new ProgressionSelector(this.BookProgressService.ProgressInHTML);
+            AnnoTarget atar = new AnnoTarget();
+            atar.Source = this.BookProgressService.CurrentHtmlPathInEpub;
+            atar.Selector = progressionSelector;
+            Annotation anno = new Annotation();
+            anno.Target = atar;
+            anno.Body = new AnnoBody();
+            DateTimeOffset nowWithOffset = DateTimeOffset.Now;
+            string iso8601WithOffset = nowWithOffset.ToString("o");
+            anno.Creadted = iso8601WithOffset;
+            anno.Modified = iso8601WithOffset;
+            anno.Motivation = "bookmarking";
+            using (var session = this.dataBase.OpenSession())
+            {
+                session.Store(anno);
+                session.SaveChanges();
+            }
+            this.AnnotationEdit.ShowAnnotationEdit(anno.Id);
+
         }
 
 

@@ -1,11 +1,7 @@
-﻿using NotEdgeForEpubWpf.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using JsonSubTypes;
 using Newtonsoft.Json;
-using JsonSubTypes;
-using System.Threading.Tasks;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Indexes;
 using VersOne.Epub;
 
 namespace NotEdgeForEpubWpf.Models
@@ -215,6 +211,26 @@ namespace NotEdgeForEpubWpf.Models
             }
             public AnnotationSet() { }
         }
+
+        //public class Annotations_ByBodyText : AbstractIndexCreationTask<Annotation>
+        //{
+        //    public Annotations_ByBodyText()
+        //    {
+        //        // Map computes a "BodyText" field that doesn't exist in Annotation
+        //        Map = annotations => from annotation in annotations
+        //                             select new
+        //                             {
+        //                                 BodyText = annotation.Body != null ? annotation.Body.Value : ""
+        //                             };
+
+        //        // Store the computed field if you want to load it without re-computation.
+        //        Store("BodyText", FieldStorage.Yes);
+
+        //        // Use the field name as a string, rather than a lambda.
+        //        Index("BodyText", FieldIndexing.Search);
+        //    }
+        //}
+
 
         //public class ProgressionSelector
         //{

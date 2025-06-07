@@ -64,11 +64,20 @@ namespace NotEdgeForEpubWpf.ViewModels
                 if (anno == null) return;
                 if (anno.Body != null)
                 {
-                    anno.Body.Value = AnnotationText;
+                    if(anno.Body.Value!=AnnotationText)
+                    {
+                        anno.Body.Value = AnnotationText;
+                        DateTimeOffset nowWithOffset = DateTimeOffset.Now;
+                        string iso8601WithOffset = nowWithOffset.ToString("o");
+                        anno.Modified = iso8601WithOffset;
+                    }
                 }
                 else
                 {
                     anno.Body = new(AnnotationText);
+                    DateTimeOffset nowWithOffset = DateTimeOffset.Now;
+                    string iso8601WithOffset = nowWithOffset.ToString("o");
+                    anno.Modified = iso8601WithOffset;
                 }
             }
             

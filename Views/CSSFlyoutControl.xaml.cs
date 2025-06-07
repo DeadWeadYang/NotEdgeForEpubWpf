@@ -63,7 +63,7 @@ namespace NotEdgeForEpubWpf.Views
             new PropertyMetadata(PlacementMode.Top)
         );
 
-        private void FontSizeTextBocPreviewKeyDown(object sender, KeyEventArgs e)
+        private void FontSizeTextBoxPreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {

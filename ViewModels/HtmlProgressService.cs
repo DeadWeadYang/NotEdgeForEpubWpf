@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Web.WebView2.Core;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,16 +22,15 @@ namespace NotEdgeForEpubWpf.ViewModels
         public bool IsUpdating {  get; set; }
 
         private const string TraceProgressScript = @"
-  (function() {
-      let lastProgress = null;
-      let rafId = null;
-      
       function getScrollProgress() {
           const doc = document.documentElement;
           const scrollTop = doc.scrollTop || document.body.scrollTop;
           const maxScroll = doc.scrollHeight - doc.clientHeight;
           return (maxScroll > 0) ? scrollTop / maxScroll : 0;
       }
+  (function() {
+      let lastProgress = null;
+      let rafId = null;
       
       function updateProgress() {
           const progress = getScrollProgress();
@@ -53,6 +53,7 @@ namespace NotEdgeForEpubWpf.ViewModels
       window.chrome.webview.hostObjects.sync.htmlProgress.IsUpdating=true;
       window.scrollTo(0, targetScroll);
       window.chrome.webview.hostObjects.sync.htmlProgress.IsUpdating=false;
+      window.chrome.webview.hostObjects.sync.htmlProgress.UpdateProgress(getScrollProgress());
   })();
 ";
 
@@ -67,6 +68,7 @@ namespace NotEdgeForEpubWpf.ViewModels
                 this.RegisterWaiting = false;
                 this.webView2.ExecuteScriptAsync(SetProgressScript);
             }
+            this.GoXPath(targetXPath);
             this.webView2.DOMContentLoaded += TryUpdateDOMContentLoaded;
         }
         public void UpdateProgress(double progress)
@@ -99,6 +101,7 @@ namespace NotEdgeForEpubWpf.ViewModels
         private void TryUpdateDOMContentLoaded(object? sender,CoreWebView2DOMContentLoadedEventArgs e)
         {
             this.webView2?.ExecuteScriptAsync(SetProgressScript);
+            this.GoXPath(targetXPath);
         }
         public void ClearWebViewRegister()
         {
@@ -110,6 +113,36 @@ namespace NotEdgeForEpubWpf.ViewModels
             
         }
 
+        private string? targetXPath;
+        public void GoXPath(string? xpath)
+        {
+            if (xpath == null) return;
+            string serializedXPath = JsonConvert.SerializeObject(xpath);
+            string script = @"
+        (function() {
+            var result = document.evaluate("+ serializedXPath + @", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+            var node = result.singleNodeValue;
+            if (node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node = node.parentNode;
+                }
+                if(!(node instanceof HTMLElement  && typeof node.scrollIntoView === ""function""))return;
+                window.chrome.webview.hostObjects.sync.htmlProgress.IsUpdating=true;
+                node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                window.chrome.webview.hostObjects.sync.htmlProgress.IsUpdating=false;
+                window.chrome.webview.hostObjects.sync.htmlProgress.UpdateProgress(getScrollProgress());
+            }
+        })();";
+            targetXPath = null;
+            if(this.webView2 == null)
+            {
+                targetXPath = xpath;
+            }
+            else
+            {
+                this.webView2.ExecuteScriptAsync(script);
+            }
+        }
 
     }
 }

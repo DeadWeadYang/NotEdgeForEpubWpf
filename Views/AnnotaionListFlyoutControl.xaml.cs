@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Windows.ApplicationModel.VoiceCommands;
 
 namespace NotEdgeForEpubWpf.Views
 {
@@ -44,7 +45,8 @@ namespace NotEdgeForEpubWpf.Views
         public static readonly DependencyProperty IsOpenProperty =
             DependencyProperty.Register(
                 nameof(IsOpen), typeof(bool),
-                typeof(AnnotaionListFlyoutControl));
+                typeof(AnnotaionListFlyoutControl),
+                new PropertyMetadata(false,OnIsOpenChanged));
 
 
         public PlacementMode Placement
@@ -59,5 +61,37 @@ namespace NotEdgeForEpubWpf.Views
             typeof(PlacementMode),
             typeof(AnnotaionListFlyoutControl),
             new PropertyMetadata(PlacementMode.Top));
+
+
+        private void AnnotaionSearchTextBoxPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                var textBox = sender as Wpf.Ui.Controls.TextBox;
+                var binding = textBox?.GetBindingExpression(Wpf.Ui.Controls.TextBox.TextProperty);
+                binding?.UpdateSource();
+                ViewModel.SubmitAnnotationSearch();
+                e.Handled = true;
+            }
+        }
+        private void BookmarkSearchTextBoxPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                var textBox = sender as Wpf.Ui.Controls.TextBox;
+                var binding = textBox?.GetBindingExpression(Wpf.Ui.Controls.TextBox.TextProperty);
+                binding?.UpdateSource();
+                ViewModel.SubmitBookmarkSearch();
+                e.Handled = true;
+            }
+        }
+        private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is AnnotaionListFlyoutControl instance && ((e.NewValue as bool?)??false))
+            {
+                instance.ViewModel.RefreshData();
+            }
+        }
+
     }
 }

@@ -35,7 +35,6 @@ class Validatable {
    */
   static fromObject(obj) {
     const instance = new this();
-      console.log(obj);
     for (const key of Object.keys(obj)) {
       const value = obj[key];
 
@@ -59,10 +58,7 @@ class Validatable {
 
         }
         else if (checkSubClass(Validatable, instance.constructor.metaPropertyInfo[key])) {
-            console.log(key + "###1");
-            console.log(instance.constructor.metaPropertyInfo[key]);
             const nested = instance.constructor.metaPropertyInfo[key].fromObject(value);
-            console.log(key + "###2")
             safePropertySet(instance, key, nested);
         }
         else {

@@ -12,6 +12,7 @@
     <Grid>
         <wv2:WebView2CompositionControl x:Name="webView2"
                    IsHitTestVisible="{Binding NoFlyoutOpened,ElementName=root}"
+                   Focusable="{Binding NoFlyoutOpened,ElementName=root}"
          />
     </Grid>
 </UserControl>
