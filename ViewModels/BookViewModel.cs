@@ -284,6 +284,7 @@ namespace NotEdgeForEpubWpf.ViewModels
             this.annoListVM = new(this.htmlTitleDict,bookModel.readingOrderPairs, this.dataBase);
             this.annoListVM.ProgressNavigateCallback += NavigateSource;
             this.annoListVM.XPathNavigateCallback += NavigateXPath;
+            this.annoListVM.OpenAnnotationEditCallback += this.AnnotationEdit.ShowAnnotationEdit;
 
             this.NavFlyout.NavHandler = NavigateUri;
             //this.CurrentHtmlChangeCallback

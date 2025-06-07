@@ -33,9 +33,11 @@ namespace NotEdgeForEpubWpf.ViewModels
         public string Title { get; set; }
 
         public int Index {  get; set; }
+        public string Id {  get; set; }
 
         public AnnotationListViewItem(Annotation anno,Dictionary<string,string>? titleDict=null,List<string>?indexList=null)
         {
+            Id = anno.Id;
             Text = anno.Body?.Value ?? "";
             Color = anno.Body?.Color ?? "yellow";
             Source = anno.Target.Source;
@@ -65,9 +67,10 @@ namespace NotEdgeForEpubWpf.ViewModels
         public string Title { get; set; }
 
         public int Index { get; set; }
-
+        public string Id {  get; set; }
         public BookmarkListViewItem(Annotation anno, Dictionary<string, string>? titleDict = null, List<string>? indexList = null)
         {
+            Id = anno.Id;
             Text = anno.Body?.Value ?? "";
             Source = anno.Target.Source;
             string? tt = null;
@@ -335,18 +338,27 @@ namespace NotEdgeForEpubWpf.ViewModels
         }
         public Func<string,double?,bool>? ProgressNavigateCallback { get; set; }
         public Func<string,string?,bool>? XPathNavigateCallback { get; set; }
+        public Action<string>? OpenAnnotationEditCallback { get; set; }
 
         [RelayCommand]
         public void TryBookmarkNavigate(object? obj)
         {
             if (obj != null && (obj is BookmarkListViewItem item))
+            {
                 ProgressNavigateCallback?.Invoke(item.Source, item.InnerProgress);
+                OpenAnnotationEditCallback?.Invoke(item.Id);
+            }
+                
         }
         [RelayCommand]
         public void TryAnnotationNavigate(object? obj)
         {
             if(obj!=null&&(obj is AnnotationListViewItem item))
+            {
                 XPathNavigateCallback?.Invoke(item.Source, item.StartNodeXPath);
+                OpenAnnotationEditCallback?.Invoke(item.Id);
+            }
+                
         }
         public void RefreshData()
         {
