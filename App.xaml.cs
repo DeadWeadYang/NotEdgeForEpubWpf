@@ -19,6 +19,7 @@ public partial class App : Application
 {
     private Mutex _instanceMutex;
     private const int WM_COPYDATA = 0x004A;
+    private const int SW_RESTORE = 9;
 
     [StructLayout(LayoutKind.Sequential)]
     public struct COPYDATASTRUCT
@@ -30,6 +31,16 @@ public partial class App : Application
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, ref COPYDATASTRUCT lParam);
+
+
+    [DllImport("user32.dll")]
+    private static extern bool IsIconic(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -44,6 +55,7 @@ public partial class App : Application
             {
                 SendArgumentsToExistingInstance(e.Args);
             }
+            BringExistingInstanceToFront();
             Shutdown();
             return;
         }
@@ -91,6 +103,30 @@ public partial class App : Application
         }
         base.OnExit(e);
     }
+
+    private void BringExistingInstanceToFront()
+    {
+        Process currentProcess = Process.GetCurrentProcess();
+        foreach (Process proc in Process.GetProcessesByName(currentProcess.ProcessName))
+        {
+            if (proc.Id == currentProcess.Id)
+                continue;
+
+            IntPtr hWnd = proc.MainWindowHandle;
+            if (hWnd != IntPtr.Zero)
+            {
+                // If the window is minimized, restore it.
+                if (IsIconic(hWnd))
+                {
+                    ShowWindow(hWnd, SW_RESTORE);
+                }
+                // Bring the window to the foreground.
+                SetForegroundWindow(hWnd);
+                break;
+            }
+        }
+    }
+
     private void SendArgumentsToExistingInstance(string[] args)
     {
         if (args.Length == 0) { return; }
